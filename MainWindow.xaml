@@ -13,7 +13,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding id}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Файл" Binding="{Binding filename}" Width="100"></DataGridTextColumn>
-                <DataGridTextColumn Header="Путь" Binding="{Binding path}" Width="150"></DataGridTextColumn>
+                <DataGridTextColumn Header="Путь" Binding="{Binding path}" Width="100"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding sourceText, StringFormat=sourceText}" ClipboardContentBinding="{x:Null}" Header="Русский текст" SortMemberPath="sourceText" Width="200"/>
                 <DataGridTextColumn Header="Старый текст" Binding="{Binding oldText}" Width="150" ></DataGridTextColumn>
                 <DataGridTextColumn Header="Новый текст" Binding="{Binding newText}"></DataGridTextColumn>
             </DataGrid.Columns>
@@ -47,7 +48,7 @@
             <Button Name="ShowQuests" Content="Показать измененные" Click="ShowQuests_Click"/>
             <Button Name="CountQuests" Content="Посчитать" Click="CountQuests_Click"/>
         </ToolBar>
-        <ToolBar x:Name="ToolbarNews" HorizontalAlignment="Left" Margin="10,117,0,0" VerticalAlignment="Top" Width="699" Height="31" Grid.ColumnSpan="2">
+        <ToolBar x:Name="ToolbarNews" HorizontalAlignment="Left" Margin="10,112,0,0" VerticalAlignment="Top" Width="699" Height="31" Grid.ColumnSpan="2">
             <Button x:Name="AddNews" Content="Добавить новости" Height="26" VerticalAlignment="Top" Width="122" Click="AddNews_Click"/>
             <Button x:Name="CountNews" Content="Посчитать" Height="26" VerticalAlignment="Top" Width="75" Click="CountNews_Click"/>
             <Button x:Name="CountTotal" Content="СУММАРНО" Height="26" VerticalAlignment="Top" Width="88" Click="CountTotal_Click"/>

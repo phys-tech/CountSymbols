@@ -41,6 +41,7 @@ namespace CountLines
             public int id { get; set; }
             public string filename { get; set; }
             public string path { get; set; }
+            public string sourceText { get; set; }
             public string oldText{ get; set; }
             public string newText { get; set; }
         }
@@ -57,6 +58,7 @@ namespace CountLines
             item.id = id;
             item.filename = CFileList.getFilenameFromPath(td.filename);
             item.path = temp;
+            item.sourceText = td.sourcePhrase;
             item.oldText = td.oldPhrase;
             item.newText = td.phrase;            
             DataGridDiff.Items.Add(item);            
@@ -66,17 +68,17 @@ namespace CountLines
         {
             DataGridDiff.Items.Clear();
             Item item1 = new Item();
-            item1.path = line1;
+            item1.sourceText = line1;
             item1.oldText = "" + num1.ToString();
             DataGridDiff.Items.Add(item1);
             Item item2 = new Item();
-            item2.path = line2;
+            item2.sourceText = line2;
             item2.oldText = "" + num2.ToString();
             DataGridDiff.Items.Add(item2);
             if (line3 != "" && num3 != 0)
             {
                 Item item3 = new Item();
-                item3.path = line3;
+                item3.sourceText = line3;
                 item3.oldText = "" + num3.ToString();
                 DataGridDiff.Items.Add(item3);
             }
