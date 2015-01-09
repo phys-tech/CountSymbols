@@ -12,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+//using System.Windows.Shapes;
 
 using InterfaceLocalizer.Classes;
 
@@ -56,7 +56,7 @@ namespace CountLines
 
             Item item = new Item();
             item.id = id;
-            item.filename = CFileList.getFilenameFromPath(td.filename);
+            item.filename = Path.GetFileName(td.filename);
             item.path = temp;
             item.sourceText = td.sourcePhrase;
             item.oldText = td.oldPhrase;
@@ -94,9 +94,9 @@ namespace CountLines
             IEnumerable<string> files = System.IO.Directory.EnumerateFiles(path1, "*.xml", SearchOption.TopDirectoryOnly);
             foreach (string filepath in files)
             {
-                if (CFileList.getFilenameFromPath(filepath) == "soCheckBox.xml")    // костыль, так как файл содержит только пустую строку
+                if (Path.GetFileName(filepath) == "soCheckBox.xml")    // костыль, так как файл содержит только пустую строку
                     continue;
-                dataManager.addFileToManager(CFileList.getFilenameFromPath(filepath));
+                dataManager.addFileToManager(Path.GetFileName(filepath));
                 count++;
             }
             OutNumber.Header = "Добавлено: " + count.ToString() + " файлов";
@@ -185,7 +185,7 @@ namespace CountLines
                     phrases++;
                 }
             }
-            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", DialogsSymbolsNow, "Фраз осталось перевести:", dataManager.undoneDialogs);
+            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", DialogsSymbolsNow);  // , "Фраз осталось перевести:", dataManager.undoneDialogs
         }
 
         //**************QUESTS add, show and count

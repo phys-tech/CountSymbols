@@ -22,13 +22,6 @@ namespace InterfaceLocalizer.Classes
             checkedFiles = files;
         }
          * */
-        public static string getFilenameFromPath(string path)
-        {
-            string filename = "";
-            int last = path.LastIndexOf("\\");
-            filename = path.Substring(last + 1);
-            return filename;
-        }
 
         public static string getListAsString(List<string> list)
         {

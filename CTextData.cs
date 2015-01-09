@@ -14,7 +14,10 @@ namespace InterfaceLocalizer.Classes
 {
     //! Словарь <QuestID, CQuest>
     using QuestDict = Dictionary<int, CQuest>;
+    //! Словарь <ID - TextData>
     using TextDict = Dictionary<int, CTextData>;
+    //! Словарь <NPCName, <DialogID, CDialog>>
+    using DialogDict = Dictionary<string, Dictionary<int, CDialog>>;
 
     public class CTextData
     {
@@ -46,6 +49,7 @@ namespace InterfaceLocalizer.Classes
         private TextDict newsDict = new TextDict();
 
         private QuestDict sourceQuestDict = new QuestDict();
+        private DialogDict sourceDialogDict = new DialogDict();
         private string path1 = "old\\Interfaces\\";
         private string path2 = "old\\Quests\\";
         public int undoneDialogs = 0;
@@ -168,6 +172,9 @@ namespace InterfaceLocalizer.Classes
             int adder2 = 20000;
             undoneDialogs = 0;
             totalDialogs = 0;
+
+            addSourceDialogs(filename);
+
             //string newPath = path2 + "\\new\\" + filename;
             string newPath = @"..\..\..\..\res\scripts\common\data\Quests\ENG\" + filename;
             string oldPath = path2 + filename;
@@ -212,6 +219,8 @@ namespace InterfaceLocalizer.Classes
                     continue;
                 }
                 */
+
+                // getting old text
                 string oldTitle = "";
                 string oldText = "";
                 tags.Push(DialogID.ToString());
@@ -222,16 +231,19 @@ namespace InterfaceLocalizer.Classes
                 {
                     oldTitle = el.Element("Title").Value.ToString();
                     oldText = el.Element("Text").Value.ToString();
-                }               
+                }         
+      
+                // getting source text
+                CDialog source = sourceDialogDict[holder][DialogID];
                 // костыли от одинаковвых ID -ужоснах
                 if (!dialogsDict.ContainsKey(DialogID))
-                    dialogsDict.Add(DialogID, new CTextData(title, oldTitle, filename, copy));
+                    dialogsDict.Add(DialogID, new CTextData(title, oldTitle, filename, copy, source.title));
                 else
-                    dialogsDict.Add(adder2++, new CTextData(title, oldTitle, filename, copy));
+                    dialogsDict.Add(adder2++, new CTextData(title, oldTitle, filename, copy, source.title));
                 if (!dialogsDict.ContainsKey(DialogID+adder))
-                    dialogsDict.Add(DialogID+adder, new CTextData(text, oldText, filename, copy));
+                    dialogsDict.Add(DialogID+adder, new CTextData(text, oldText, filename, copy, source.text));
                 else
-                    dialogsDict.Add(adder2++, new CTextData(text, oldText, filename, copy));
+                    dialogsDict.Add(adder2++, new CTextData(text, oldText, filename, copy, source.text));
                 tags.Pop();
             }
         }
@@ -298,9 +310,9 @@ namespace InterfaceLocalizer.Classes
 
 
 
-        public void addSourceQuests(String filename)
+        public void addSourceQuests(string filename)
         {
-            String sPath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename; ;
+            string sPath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
             if (!File.Exists(sPath))
                 return;
             XDocument doc = new XDocument();
@@ -321,6 +333,52 @@ namespace InterfaceLocalizer.Classes
             }
 
         }
+
+        private void addSourceDialogs(string filename)
+        {
+            string sPath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
+            if (!File.Exists(sPath))
+                return;
+            XDocument doc = new XDocument();
+            doc = XDocument.Load(sPath);
+            foreach (XElement item in doc.Root.Elements())
+            {
+                int DialogID = int.Parse(item.Element("DialogID").Value);
+                string Title = item.Element("Title").Value.Trim();
+                string Text = item.Element("Text").Value.Trim();
+                string holder = item.Element("Holder").Value.Trim();
+
+                int Version = 0;
+                if (!item.Element("Version").Value.Equals(""))
+                    Version = int.Parse(item.Element("Version").Value);
+                /*
+                NodeCoordinates nodeCoord = new NodeCoordinates();
+                if (item.Descendants("NodeCoordinates").ToList().Count > 0)
+                {
+                    if (item.Element("NodeCoordinates").Descendants().Any(itm2 => itm2.Name == "Active"))
+                    {
+                        if (item.Element("NodeCoordinates").Element("Active").Value.Equals("1"))
+                            nodeCoord.Active = true;
+                        else
+                            nodeCoord.Active = false;
+                    }
+                }
+                */
+
+                if (sourceDialogDict.Keys.Contains(holder))
+                {
+                    if (!sourceDialogDict[holder].Keys.Contains(DialogID))
+                        sourceDialogDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
+                }
+                else
+                {
+                    sourceDialogDict.Add(holder, new Dictionary<int, CDialog>());
+                    sourceDialogDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
+                }
+                
+            }
+        }
+
 
         public void addNewsToManager()
         {

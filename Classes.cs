@@ -31,4 +31,27 @@ namespace CountLines
             holder = _holder;
         }
     }
+
+    public class CDialog
+    {
+        int dialogID;
+        int version;
+        public string title;
+        public string text;
+        public string holder;
+
+        public CDialog()
+        { 
+        
+        }
+
+        public CDialog(int _id, int vers, string _title, string _text, string _holder)
+        {
+            dialogID = _id;
+            version = vers;
+            title = _title;
+            text = _text;
+            holder = _holder;
+        }
+    }
 }
