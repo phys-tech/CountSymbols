@@ -2,7 +2,7 @@
         x:Name="MainWindowMy"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindowMy" Height="459" Width="727" 
+        Title="Расчет работы переводчика" Height="459" Width="727" 
         >
     <Grid>
         <Grid.ColumnDefinitions>

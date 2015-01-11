@@ -100,6 +100,7 @@ namespace CountLines
                 count++;
             }
             OutNumber.Header = "Добавлено: " + count.ToString() + " файлов";
+            AddAllFiles.IsEnabled = false;
         }
 
         private void ShowAll_Click(object sender, RoutedEventArgs e)
@@ -152,6 +153,7 @@ namespace CountLines
         {
             dataManager.addDialogsToManager("Dialogs.xml");
             OutNumber.Header = "Диалоги добавлены";
+            AddDialogs.IsEnabled = false;
         }
 
         private void ShowChangedDialogs_Click(object sender, RoutedEventArgs e)
@@ -194,6 +196,7 @@ namespace CountLines
         {
             dataManager.addQuestsToManager("Quests.xml");
             OutNumber.Header = "Квесты добавлены";
+            AddQuests.IsEnabled = false;
         }
 
         private void ShowQuests_Click(object sender, RoutedEventArgs e)
@@ -237,6 +240,7 @@ namespace CountLines
         {
             dataManager.addNewsToManager();
             OutNumber.Header = "Новости добавлены";
+            AddNews.IsEnabled = false;
         }
 
         private void CountNews_Click(object sender, RoutedEventArgs e)

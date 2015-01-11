@@ -18,7 +18,11 @@ namespace CountLines
 
         public CQuest()
         {
-
+            description = "";
+            title = "";
+            onWin = "";
+            onFailed = "";
+            holder = "";
         }
         public CQuest(int id, int vers, string _desc, string _title, string _onWin, string _onFailed, string _holder)
         {
@@ -41,8 +45,10 @@ namespace CountLines
         public string holder;
 
         public CDialog()
-        { 
-        
+        {
+            title = "";
+            text = "";
+            holder = "";
         }
 
         public CDialog(int _id, int vers, string _title, string _text, string _holder)

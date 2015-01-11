@@ -50,6 +50,8 @@ namespace InterfaceLocalizer.Classes
 
         private QuestDict sourceQuestDict = new QuestDict();
         private DialogDict sourceDialogDict = new DialogDict();
+        private QuestDict oldQuestDict = new QuestDict();
+        private DialogDict oldDialogDict = new DialogDict();
         private string path1 = "old\\Interfaces\\";
         private string path2 = "old\\Quests\\";
         public int undoneDialogs = 0;
@@ -173,11 +175,12 @@ namespace InterfaceLocalizer.Classes
             undoneDialogs = 0;
             totalDialogs = 0;
 
-            addSourceDialogs(filename);
-
-            //string newPath = path2 + "\\new\\" + filename;
             string newPath = @"..\..\..\..\res\scripts\common\data\Quests\ENG\" + filename;
             string oldPath = path2 + filename;
+            string sourcePath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
+            addDialogsToDict(sourcePath, sourceDialogDict);
+            addDialogsToDict(oldPath, oldDialogDict);
+
             XDocument doc = XDocument.Load(newPath);            
             XDocument oldDoc = new XDocument();
             if (File.Exists(oldPath))
@@ -220,30 +223,26 @@ namespace InterfaceLocalizer.Classes
                 }
                 */
 
-                // getting old text
-                string oldTitle = "";
-                string oldText = "";
                 tags.Push(DialogID.ToString());
                 Stack<string> copy = new Stack<string>(tags.ToArray());
-                IEnumerable<XElement> check = oldDoc.Root.Elements().Where(itm => itm.Element("DialogID").Value == DialogID.ToString() &&
-                    itm.Element("Holder").Value == holder);
-                foreach (XElement el in check)
-                {
-                    oldTitle = el.Element("Title").Value.ToString();
-                    oldText = el.Element("Text").Value.ToString();
-                }         
-      
+
+                // getting old text
+                CDialog old = new CDialog();
+                if (oldDialogDict.ContainsKey(holder))
+                    if (oldDialogDict[holder].ContainsKey(DialogID))
+                     old = oldDialogDict[holder][DialogID];
                 // getting source text
                 CDialog source = sourceDialogDict[holder][DialogID];
-                // костыли от одинаковвых ID -ужоснах
+
+                // костыли от одинаковых ID -ужоснах
                 if (!dialogsDict.ContainsKey(DialogID))
-                    dialogsDict.Add(DialogID, new CTextData(title, oldTitle, filename, copy, source.title));
+                    dialogsDict.Add(DialogID, new CTextData(title, old.title, filename, copy, source.title));
                 else
-                    dialogsDict.Add(adder2++, new CTextData(title, oldTitle, filename, copy, source.title));
+                    dialogsDict.Add(adder2++, new CTextData(title, old.title, filename, copy, source.title));
                 if (!dialogsDict.ContainsKey(DialogID+adder))
-                    dialogsDict.Add(DialogID+adder, new CTextData(text, oldText, filename, copy, source.text));
+                    dialogsDict.Add(DialogID+adder, new CTextData(text, old.text, filename, copy, source.text));
                 else
-                    dialogsDict.Add(adder2++, new CTextData(text, oldText, filename, copy, source.text));
+                    dialogsDict.Add(adder2++, new CTextData(text, old.text, filename, copy, source.text));
                 tags.Pop();
             }
         }
@@ -256,11 +255,12 @@ namespace InterfaceLocalizer.Classes
             const int adderF = 30000;
             undoneQuests = 0;
 
-            addSourceQuests(filename);
-
-            //string newPath = path2 + "\\new\\" + filename;
             string newPath = @"..\..\..\..\res\scripts\common\data\Quests\ENG\" + filename;
             string oldPath = path2 + filename;
+            string sourcePath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
+            addQuestsToDict(sourcePath, sourceQuestDict);
+            addQuestsToDict(oldPath, oldQuestDict);
+
             XDocument doc = XDocument.Load(newPath);
             XDocument oldDoc = new XDocument();
             if (File.Exists(oldPath))
@@ -280,67 +280,56 @@ namespace InterfaceLocalizer.Classes
                     undoneQuests++;
                     continue;
                 }
-                // getting old text
-                string oldTitle = "";
-                string oldDesc = "";
-                string oldWin = "";
-                string oldFail = "";
+
                 tags.Push(QuestID.ToString());
                 Stack<string> copy = new Stack<string>(tags.ToArray());
-                IEnumerable<XElement> check = oldDoc.Root.Elements().Where(itm => itm.Element("QuestID").Value == QuestID.ToString() &&
-                    itm.Element("Additional").Element("Holder").Value == holder);
-                foreach (XElement el in check)
-                {
-                    oldTitle = el.Element("QuestInformation").Element("Title").Value.ToString();
-                    oldDesc = el.Element("QuestInformation").Element("Description").Value.ToString();
-                    oldWin = el.Element("QuestInformation").Element("onWin").Value.ToString();
-                    oldFail = el.Element("QuestInformation").Element("onFailed").Value.ToString();
-                }
 
+                // getting old text
+                CQuest old = new CQuest();
+                if (oldQuestDict.ContainsKey(QuestID))
+                    old = oldQuestDict[QuestID];
                 // getting source text
                 CQuest source = sourceQuestDict[QuestID];
 
-                questsDict.Add(QuestID, new CTextData(title, oldTitle, filename, copy, source.title));
-                questsDict.Add(QuestID + adder, new CTextData(desc, oldDesc, filename, copy, source.description));
-                questsDict.Add(QuestID + adderW, new CTextData(win, oldWin, filename, copy, source.onWin));
-                questsDict.Add(QuestID + adderF, new CTextData(fail, oldFail, filename, copy, source.onFailed));
+                questsDict.Add(QuestID, new CTextData(title, old.title, filename, copy, source.title));
+                questsDict.Add(QuestID + adder, new CTextData(desc, old.description, filename, copy, source.description));
+                questsDict.Add(QuestID + adderW, new CTextData(win, old.onWin, filename, copy, source.onWin));
+                questsDict.Add(QuestID + adderF, new CTextData(fail, old.onFailed, filename, copy, source.onFailed));
                 tags.Pop();
             }
         }
 
-
-
-        public void addSourceQuests(string filename)
+        public void addQuestsToDict(string fullPath, QuestDict targetDict)
         {
-            string sPath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
-            if (!File.Exists(sPath))
+            if (!File.Exists(fullPath))
                 return;
             XDocument doc = new XDocument();
-            doc = XDocument.Load(sPath);
+            doc = XDocument.Load(fullPath);
 
             foreach (XElement item in doc.Root.Elements())
             {
                 int QuestID = int.Parse(item.Element("QuestID").Value);
-                int Version = int.Parse(item.Element("Version").Value);
+                int Version = 0;
+                if (item.Descendants("Version").ToList().Count > 0)
+                    if (!item.Element("Version").Value.Equals(""))
+                        Version = int.Parse(item.Element("Version").Value);
                 String Description = item.Element("QuestInformation").Element("Description").Value.Trim();
                 String Title = item.Element("QuestInformation").Element("Title").Value.Trim();
                 String onWin = item.Element("QuestInformation").Element("onWin").Value.Trim();
                 String onFailed = item.Element("QuestInformation").Element("onFailed").Value.Trim();
                 String Holder = item.Element("Additional").Element("Holder").Value.Trim();
 
-                if (!sourceQuestDict.ContainsKey(QuestID))
-                    sourceQuestDict.Add(QuestID, new CQuest(QuestID,Version, Description, Title, onWin, onFailed, Holder));
+                if (!targetDict.ContainsKey(QuestID))
+                    targetDict.Add(QuestID, new CQuest(QuestID,Version, Description, Title, onWin, onFailed, Holder));
             }
-
         }
 
-        private void addSourceDialogs(string filename)
+        private void addDialogsToDict(string fullPath, DialogDict targetDict)
         {
-            string sPath = @"..\..\..\..\res\scripts\common\data\Quests\RUS\" + filename;
-            if (!File.Exists(sPath))
+            if (!File.Exists(fullPath))
                 return;
             XDocument doc = new XDocument();
-            doc = XDocument.Load(sPath);
+            doc = XDocument.Load(fullPath);
             foreach (XElement item in doc.Root.Elements())
             {
                 int DialogID = int.Parse(item.Element("DialogID").Value);
@@ -349,8 +338,9 @@ namespace InterfaceLocalizer.Classes
                 string holder = item.Element("Holder").Value.Trim();
 
                 int Version = 0;
-                if (!item.Element("Version").Value.Equals(""))
-                    Version = int.Parse(item.Element("Version").Value);
+                if (item.Descendants("Version").ToList().Count > 0)
+                    if (!item.Element("Version").Value.Equals(""))
+                        Version = int.Parse(item.Element("Version").Value);
                 /*
                 NodeCoordinates nodeCoord = new NodeCoordinates();
                 if (item.Descendants("NodeCoordinates").ToList().Count > 0)
@@ -365,20 +355,18 @@ namespace InterfaceLocalizer.Classes
                 }
                 */
 
-                if (sourceDialogDict.Keys.Contains(holder))
+                if (targetDict.Keys.Contains(holder))
                 {
-                    if (!sourceDialogDict[holder].Keys.Contains(DialogID))
-                        sourceDialogDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
+                    if (!targetDict[holder].Keys.Contains(DialogID))
+                        targetDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
                 }
                 else
                 {
-                    sourceDialogDict.Add(holder, new Dictionary<int, CDialog>());
-                    sourceDialogDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
+                    targetDict.Add(holder, new Dictionary<int, CDialog>());
+                    targetDict[holder].Add(DialogID, new CDialog(DialogID, Version, Title, Text, holder));    // , nodeCoord
                 }
-                
             }
         }
-
 
         public void addNewsToManager()
         {
