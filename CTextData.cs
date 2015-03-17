@@ -18,6 +18,7 @@ namespace InterfaceLocalizer.Classes
     using TextDict = Dictionary<int, CTextData>;
     //! Словарь <NPCName, <DialogID, CDialog>>
     using DialogDict = Dictionary<string, Dictionary<int, CDialog>>;
+    public enum status { empty, previous, translated, newly, outdated };
 
     public class CTextData
     {
@@ -26,11 +27,12 @@ namespace InterfaceLocalizer.Classes
         public string sourcePhrase;
         public string filename;
         public Stack<string> tags;
+        public status status;
 
         public CTextData()
         {         
         }
-        public CTextData(string _phrase, string _eng, string _filename, Stack<string> _tags, string _sourcePhrase = "")
+        public CTextData(string _phrase, string _eng, string _filename, Stack<string> _tags, string _sourcePhrase = "", bool _translated = false)
         {
             phrase = _phrase;
             filename = _filename;
@@ -38,6 +40,16 @@ namespace InterfaceLocalizer.Classes
             tags = _tags;
             oldPhrase = _eng;
             sourcePhrase = _sourcePhrase;
+            if (phrase.Length == 0 && sourcePhrase.Length == 0)
+                status = status.empty;
+            else if (phrase == oldPhrase && phrase.Length > 0)
+                status = status.previous;
+            else if (phrase == sourcePhrase || (sourcePhrase.Length > 0 && phrase.Length == 0))
+                status = status.newly;
+            else if (_translated)
+                status = status.translated;
+            else
+                status = status.outdated;
         }
     }
 
@@ -268,18 +280,14 @@ namespace InterfaceLocalizer.Classes
 
             foreach (XElement item in doc.Root.Elements())
             {
-                Regex reg = new Regex("^[a-zA-Z0-9\\W]*$", RegexOptions.IgnoreCase);
                 int QuestID = int.Parse(item.Element("QuestID").Value);
                 string title = item.Element("QuestInformation").Element("Title").Value.Trim();
                 string desc = item.Element("QuestInformation").Element("Description").Value.Trim();
                 string win = item.Element("QuestInformation").Element("onWin").Value.Trim();
                 string fail = item.Element("QuestInformation").Element("onFailed").Value.Trim();
                 string holder = item.Element("Additional").Element("Holder").Value.Trim();
-                if (!reg.IsMatch(title) || !reg.IsMatch(desc) || !reg.IsMatch(win) || !reg.IsMatch(fail))
-                {
-                    undoneQuests++;
-                    continue;
-                }
+                int Version = 0;
+                Version = int.Parse(item.Element("Version").Value);
 
                 tags.Push(QuestID.ToString());
                 Stack<string> copy = new Stack<string>(tags.ToArray());
@@ -291,10 +299,12 @@ namespace InterfaceLocalizer.Classes
                 // getting source text
                 CQuest source = sourceQuestDict[QuestID];
 
-                questsDict.Add(QuestID, new CTextData(title, old.title, filename, copy, source.title));
-                questsDict.Add(QuestID + adder, new CTextData(desc, old.description, filename, copy, source.description));
-                questsDict.Add(QuestID + adderW, new CTextData(win, old.onWin, filename, copy, source.onWin));
-                questsDict.Add(QuestID + adderF, new CTextData(fail, old.onFailed, filename, copy, source.onFailed));
+                bool translated = (source.getVersion() == Version);
+
+                questsDict.Add(QuestID, new CTextData(title, old.title, filename, copy, source.title, translated));
+                questsDict.Add(QuestID + adder, new CTextData(desc, old.description, filename, copy, source.description, translated));
+                questsDict.Add(QuestID + adderW, new CTextData(win, old.onWin, filename, copy, source.onWin, translated));
+                questsDict.Add(QuestID + adderF, new CTextData(fail, old.onFailed, filename, copy, source.onFailed, translated));
                 tags.Pop();
             }
         }

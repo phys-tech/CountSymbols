@@ -64,7 +64,7 @@ namespace CountLines
             DataGridDiff.Items.Add(item);            
         }
 
-        private void addInfoToGridView(String line1, int num1, String line2, int num2, String line3 = "", int num3 = 0)
+        private void addInfoToGridView(String line1, int num1, String line2, int num2, String line3 = "", int num3 = 0, String line4 = "", int num4 = 0)
         {
             DataGridDiff.Items.Clear();
             Item item1 = new Item();
@@ -81,6 +81,13 @@ namespace CountLines
                 item3.sourceText = line3;
                 item3.oldText = "" + num3.ToString();
                 DataGridDiff.Items.Add(item3);
+            }
+            if (line4 != "" && num4 != 0)
+            {
+                Item item4 = new Item();
+                item4.sourceText = line4;
+                item4.oldText = "" + num4.ToString();
+                DataGridDiff.Items.Add(item4);
             }
         }
 
@@ -199,14 +206,28 @@ namespace CountLines
             AddQuests.IsEnabled = false;
         }
 
-        private void ShowQuests_Click(object sender, RoutedEventArgs e)
+        private void ShowTranslatedQuests_Click(object sender, RoutedEventArgs e)
         {
             DataGridDiff.Items.Clear();
             Dictionary<int, CTextData> textDict = dataManager.getQuestsDict();
             DataGridDiff.BeginInit();
             foreach (int id in textDict.Keys)
             {
-                if (textDict[id].phrase != textDict[id].oldPhrase)
+                if (textDict[id].status == status.translated)
+                    addDataToGridView(id, textDict[id]);
+            }
+            DataGridDiff.EndInit();
+            OutNumber.Header = "Выведено: " + DataGridDiff.Items.Count.ToString();
+        }
+
+        private void ShowUndoneQuests_Click(object sender, RoutedEventArgs e)
+        {
+            DataGridDiff.Items.Clear();
+            Dictionary<int, CTextData> textDict = dataManager.getQuestsDict();
+            DataGridDiff.BeginInit();
+            foreach (int id in textDict.Keys)
+            {
+                if (textDict[id].status == status.newly || textDict[id].status == status.outdated)
                     addDataToGridView(id, textDict[id]);
             }
             DataGridDiff.EndInit();
@@ -218,20 +239,43 @@ namespace CountLines
             DataGridDiff.Items.Clear();
             Dictionary<int, CTextData> textDict = dataManager.getQuestsDict();
             QuestsSymbolsNow = 0;
-            int symbolsWas = 0;
             int phrases = 0;
+            int todo = 0;
             foreach (int id in textDict.Keys)
             {
-                if (textDict[id].phrase != textDict[id].oldPhrase)
+                if (textDict[id].status == status.translated)
                 {
                     QuestsSymbolsNow += textDict[id].phrase.Length;
-                    if (textDict[id].oldPhrase != "<NO DATA>")
-                        symbolsWas += textDict[id].oldPhrase.Length;
                     phrases++;
                 }
+                if (textDict[id].status == status.newly || textDict[id].status == status.outdated)
+                    todo++;
             }
 
-            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", QuestsSymbolsNow, "Фраз осталось перевести:", dataManager.undoneQuests);
+            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", QuestsSymbolsNow, "Фраз осталось перевести:", todo);
+        }
+
+        private void Test_Click(object sender, RoutedEventArgs e)
+        {
+            DataGridDiff.Items.Clear();
+            Dictionary<int, CTextData> textDict = dataManager.getQuestsDict();
+            int nw, tr, emp, prev, outd;
+            nw = tr = emp = prev = outd = 0;
+            foreach (int id in textDict.Keys)
+            {
+                if (textDict[id].status == status.translated)
+                    tr++;
+                if (textDict[id].status == status.newly)
+                    nw++;
+                if (textDict[id].status == status.empty)
+                    emp++;
+                if (textDict[id].status == status.previous)
+                    prev++;
+                if (textDict[id].status == status.outdated)
+                    outd++;
+            }
+
+            addInfoToGridView("переведено:", tr, " прошлых:", prev, " новых:", nw, " устаревших", outd);
         }
 
         //**************NEWS and GOSSIP add and count

@@ -34,6 +34,10 @@ namespace CountLines
             onFailed = _onFailed;
             holder = _holder;
         }
+        public int getVersion()
+        {
+            return version;        
+        }
     }
 
     public class CDialog
