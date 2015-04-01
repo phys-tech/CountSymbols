@@ -40,12 +40,13 @@
         </ToolBar>
         <ToolBar Name="ToolbarDialogs" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Height="31" Width="699" Grid.ColumnSpan="2">
             <Button x:Name="AddDialogs" Content="Добавить диалоги" Click="AddDialogs_Click" Margin="0,0,0,5" Height="21" RenderTransformOrigin="0.486,1.286"/>
-            <Button Name="ShowChangedDialogs" Content="Показать измененные" Click="ShowChangedDialogs_Click"/>
-            <Button Name="CountDialogs" Content="Посчитать" Click="CountDialogs_Click"/>
+            <Button x:Name="ShowDoneDialogs" Content="Показать готовые" Click="ShowDoneDialogs_Click"/>
+            <Button x:Name="ShowUndoneDialogs" Content="Неготовые" Height="26" VerticalAlignment="Top" Width="75" Click="ShowUndoneDialogs_Click"/>
+            <Button x:Name="CountDialogs" Content="Посчитать" Click="CountDialogs_Click"/>
         </ToolBar>
         <ToolBar Name="ToolbarQuests" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="699" Height="31" Grid.ColumnSpan="2">
             <Button Name="AddQuests" Content="Добавить квесты" Click="AddQuests_Click"/>
-            <Button Name="ShowQuests" Content="Показать готовые" Click="ShowTranslatedQuests_Click"/>
+            <Button x:Name="ShowDoneQuests" Content="Показать готовые" Click="ShowTranslatedQuests_Click"/>
             <Button x:Name="ShowUndoneQuests" Content="Неготовые" Height="26" VerticalAlignment="Center" Width="75" Click="ShowUndoneQuests_Click"/>
             <Button x:Name="CountQuests" Content="Посчитать" Click="CountQuests_Click" RenderTransformOrigin="0.508,0.455"/>
             <Button x:Name="Test" Content="Test" Height="26" VerticalAlignment="Top" Width="75" Click="Test_Click" Visibility="Hidden"/>

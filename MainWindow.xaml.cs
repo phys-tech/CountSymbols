@@ -163,14 +163,28 @@ namespace CountLines
             AddDialogs.IsEnabled = false;
         }
 
-        private void ShowChangedDialogs_Click(object sender, RoutedEventArgs e)
+        private void ShowDoneDialogs_Click(object sender, RoutedEventArgs e)
         {
             DataGridDiff.Items.Clear();
             Dictionary<int, CTextData> textDict = dataManager.getDialogsDict();
             DataGridDiff.BeginInit();
             foreach (int id in textDict.Keys)
             {
-                if (textDict[id].phrase != textDict[id].oldPhrase)
+                if (textDict[id].status == status.translated)
+                    addDataToGridView(id, textDict[id]);
+            }
+            DataGridDiff.EndInit();
+            OutNumber.Header = "Выведено: " + DataGridDiff.Items.Count.ToString();
+        }
+
+        private void ShowUndoneDialogs_Click(object sender, RoutedEventArgs e)
+        {
+            DataGridDiff.Items.Clear();
+            Dictionary<int, CTextData> textDict = dataManager.getDialogsDict();
+            DataGridDiff.BeginInit();
+            foreach (int id in textDict.Keys)
+            {
+                if (textDict[id].active && (textDict[id].status == status.newly || textDict[id].status == status.outdated))
                     addDataToGridView(id, textDict[id]);
             }
             DataGridDiff.EndInit();
@@ -182,19 +196,19 @@ namespace CountLines
             DataGridDiff.Items.Clear();
             Dictionary<int, CTextData> textDict = dataManager.getDialogsDict();
             DialogsSymbolsNow = 0;
-            int symbolsWas = 0;
             int phrases = 0;
+            int todo = 0;
             foreach (int id in textDict.Keys)
             {
-                if (textDict[id].phrase != textDict[id].oldPhrase)
+                if (textDict[id].status == status.translated)
                 {
                     DialogsSymbolsNow += textDict[id].phrase.Length;
-                    if (textDict[id].oldPhrase != "<NO DATA>")
-                        symbolsWas += textDict[id].oldPhrase.Length;
                     phrases++;
                 }
+                if (textDict[id].active && (textDict[id].status == status.newly || textDict[id].status == status.outdated))
+                    todo++;
             }
-            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", DialogsSymbolsNow);  // , "Фраз осталось перевести:", dataManager.undoneDialogs
+            addInfoToGridView("Фраз переведено:", phrases, "Символов переведено:", DialogsSymbolsNow, "Фраз осталось перевести:", todo);
         }
 
         //**************QUESTS add, show and count

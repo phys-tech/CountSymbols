@@ -63,5 +63,9 @@ namespace CountLines
             text = _text;
             holder = _holder;
         }
+        public int getVersion()
+        {
+            return version;
+        }
     }
 }
